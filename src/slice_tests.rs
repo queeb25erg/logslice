@@ -64,4 +64,21 @@ mod tests {
         let slicer = Slicer::new(Some(tr), FieldFilterChain::new(vec![]));
         assert_eq!(slicer.apply(&entries).len(), 0);
     }
+
+    #[test]
+    fn test_combined_time_range_and_field_filter() {
+        let start = Utc.timestamp_opt(1000, 0).unwrap();
+        let end = Utc.timestamp_opt(2000, 0).unwrap();
+        let tr = TimeRange::new(Some(start), Some(end));
+        let entries = vec![
+            entry(Some(1500), &[("level", "info")]),
+            entry(Some(1500), &[("level", "error")]),
+            entry(Some(500), &[("level", "error")]),
+        ];
+        let f = FieldFilter::new("level".into(), "error".into());
+        let slicer = Slicer::new(Some(tr), FieldFilterChain::new(vec![f]));
+        let result = slicer.apply(&entries);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].fields.get("level").unwrap(), "error");
+    }
 }
