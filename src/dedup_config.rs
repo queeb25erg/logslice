@@ -41,4 +41,18 @@ impl DedupConfig {
             }
         }
     }
+
+    /// Returns a human-readable description of the active dedup strategy,
+    /// or `None` if deduplication is disabled.
+    pub fn describe(&self) -> Option<String> {
+        if !self.enabled {
+            return None;
+        }
+        let desc = match &self.strategy {
+            DedupStrategy::ExactMessage => "exact message match".to_string(),
+            DedupStrategy::Consecutive => "consecutive duplicates".to_string(),
+            DedupStrategy::ByField(field) => format!("by field '{field}'"),
+        };
+        Some(desc)
+    }
 }
