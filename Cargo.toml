@@ -3,6 +3,10 @@ name = "logslice"
 version = "0.1.0"
 edition = "2021"
 description = "Fast CLI tool for filtering and slicing structured log files by time range or field value"
+license = "MIT"
+repository = "https://github.com/user/logslice"
+keywords = ["log", "cli", "json", "filter", "slice"]
+categories = ["command-line-utilities"]
 
 [[bin]]
 name = "logslice"
