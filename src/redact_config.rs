@@ -19,6 +19,11 @@ impl RedactConfig {
         self.mask = mask.into();
         self
     }
+
+    /// Returns `true` if the given field name should be redacted.
+    pub fn should_redact(&self, field: &str) -> bool {
+        self.fields.iter().any(|f| f == field)
+    }
 }
 
 impl Default for RedactConfig {
