@@ -17,6 +17,14 @@ mod tests {
         }
     }
 
+    fn make_chain(filters: &[(&str, &str)]) -> FieldFilterChain {
+        let filters = filters
+            .iter()
+            .map(|(k, v)| FieldFilter::new(k.to_string(), v.to_string()))
+            .collect();
+        FieldFilterChain::new(filters)
+    }
+
     #[test]
     fn test_empty_chain_matches_all() {
         let chain = FieldFilterChain::new(vec![]);
@@ -26,42 +34,35 @@ mod tests {
 
     #[test]
     fn test_single_filter_match() {
-        let f = FieldFilter::new("level".into(), "error".into());
-        let chain = FieldFilterChain::new(vec![f]);
+        let chain = make_chain(&[("level", "error")]);
         let entry = make_entry(&[("level", "error")]);
         assert!(chain.matches(&entry));
     }
 
     #[test]
     fn test_single_filter_no_match() {
-        let f = FieldFilter::new("level".into(), "error".into());
-        let chain = FieldFilterChain::new(vec![f]);
+        let chain = make_chain(&[("level", "error")]);
         let entry = make_entry(&[("level", "info")]);
         assert!(!chain.matches(&entry));
     }
 
     #[test]
     fn test_multiple_filters_all_match() {
-        let f1 = FieldFilter::new("level".into(), "warn".into());
-        let f2 = FieldFilter::new("service".into(), "auth".into());
-        let chain = FieldFilterChain::new(vec![f1, f2]);
+        let chain = make_chain(&[("level", "warn"), ("service", "auth")]);
         let entry = make_entry(&[("level", "warn"), ("service", "auth")]);
         assert!(chain.matches(&entry));
     }
 
     #[test]
     fn test_multiple_filters_partial_match() {
-        let f1 = FieldFilter::new("level".into(), "warn".into());
-        let f2 = FieldFilter::new("service".into(), "auth".into());
-        let chain = FieldFilterChain::new(vec![f1, f2]);
+        let chain = make_chain(&[("level", "warn"), ("service", "auth")]);
         let entry = make_entry(&[("level", "warn"), ("service", "payments")]);
         assert!(!chain.matches(&entry));
     }
 
     #[test]
     fn test_missing_field_no_match() {
-        let f = FieldFilter::new("host".into(), "web01".into());
-        let chain = FieldFilterChain::new(vec![f]);
+        let chain = make_chain(&[("host", "web01")]);
         let entry = make_entry(&[("level", "info")]);
         assert!(!chain.matches(&entry));
     }
