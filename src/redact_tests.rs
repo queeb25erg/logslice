@@ -66,3 +66,13 @@ fn test_redact_all() {
     let result = redactor.redact_all(entries);
     assert!(result.iter().all(|e| e.fields.get("key").map(|v| v == "***").unwrap_or(true)));
 }
+
+#[test]
+fn test_redact_empty_value() {
+    // A field that is already empty should still be replaced with the mask.
+    let config = RedactConfig::new(vec!["password".to_string()]);
+    let redactor = Redactor::new(config);
+    let mut entry = make_entry(&[("password", "")]);
+    redactor.redact(&mut entry);
+    assert_eq!(entry.fields["password"], "***");
+}
